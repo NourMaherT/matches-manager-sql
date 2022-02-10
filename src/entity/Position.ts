@@ -1,9 +1,10 @@
-import {Entity, Column, PrimaryGeneratedColumn} from "typeorm";
+import {Entity, Column, PrimaryGeneratedColumn, OneToMany} from "typeorm";
 import {Length} from "class-validator";
+import {Player} from "./Player";
 
 export enum positions {
-    offencive = "offencive",
-    defencive = "defencive",
+    offencive = "offensive",
+    defencive = "defensive",
     midFielder = "midfielder",
     rightWinger = "right winger",
     leftWinger = "left winger",
@@ -25,4 +26,6 @@ export class Position {
     @Length(4, 20)
     name!: positions;
 
+    @OneToMany(() => Player, player => player.position)
+    players: Player[];
 }

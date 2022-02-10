@@ -1,7 +1,7 @@
 import {getRepository} from "typeorm";
 import * as express from "express";
-import {Request, Response, NextFunction} from "express";
-import {Position} from "../entity/Position";
+import {Request, Response} from "express";
+import {Position, positions} from "../entity/Position";
 import {validate} from "class-validator"; 
 import {auth} from '../middleware/auth';
 import {admin} from '../middleware/admin';
@@ -26,6 +26,9 @@ router.get("/:id", auth, async(async function(req: Request, res: Response) {
 router.post("/", [auth, admin], async(async function(req: Request, res: Response) {
     let position = await getRepository(Position).findOne({ name: req.body.name })
     if(position) return res.status(400).send('Position is alresdy existed!');
+
+    
+    // if(req.body.name isn't in positions enum return error)
 
     position = new Position();
     position.name = req.body.name;

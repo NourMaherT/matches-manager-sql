@@ -6,6 +6,7 @@ import 'express-async-errors';
 
 import {userRouter} from './routers/users'
 import {positionRouter} from './routers/positions'
+import {playerRouter} from './routers/players'
 // import {error} from './middleware/error'
 
 const app = express()
@@ -15,6 +16,7 @@ app.use(logger('dev'))
 
 app.use('/api/users', userRouter)
 app.use('/api/positions', positionRouter)
+app.use('/api/players', playerRouter)
 // app.use(error)
 
 createConnection().then(async connection => {
