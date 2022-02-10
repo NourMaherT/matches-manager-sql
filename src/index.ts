@@ -2,9 +2,11 @@ import "reflect-metadata";
 import {createConnection} from "typeorm";
 import * as logger from 'morgan';
 import * as express from 'express';
+import 'express-async-errors';
 
 import {userRouter} from './routers/users'
-import {errors} from './middleware/error'
+import {positionRouter} from './routers/positions'
+// import {error} from './middleware/error'
 
 const app = express()
 app.use(express.json())
@@ -12,7 +14,8 @@ app.use(express.urlencoded({ extended: true }))
 app.use(logger('dev'))
 
 app.use('/api/users', userRouter)
-app.use(errors)
+app.use('/api/positions', positionRouter)
+// app.use(error)
 
 createConnection().then(async connection => {
     console.log("Connected to the database...");
