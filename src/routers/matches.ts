@@ -11,7 +11,7 @@ import {async} from '../middleware/async';
 const router = express.Router();
 
 router.get("/", auth, async(async function(req: Request, res: Response) {
-    const matches = await getRepository(Match).find({ order: { date: 'DESC' } });
+    const matches = await getRepository(Match).find({ order: {date: 'DESC'} });
     res.status(200).send(matches);
 }));
 

@@ -1,6 +1,7 @@
 import {Entity, Column, PrimaryGeneratedColumn, OneToMany} from "typeorm";
 import {Length} from "class-validator";
 import {Player} from "./Player";
+import { MatchDetailes } from "./MatchDetailes";
 
 export enum positions {
     offencive = "offensive",
@@ -28,4 +29,7 @@ export class Position {
 
     @OneToMany(() => Player, player => player.position)
     players: Player[];
+
+    @OneToMany(() => MatchDetailes, matchDetailes => matchDetailes.position)
+    matchDetailes: MatchDetailes[];
 }

@@ -8,6 +8,7 @@ import {userRouter} from './routers/users';
 import {positionRouter} from './routers/positions';
 import {playerRouter} from './routers/players';
 import {matchRouter} from './routers/matches';
+import {mdRouter} from './routers/matchesDetailes';
 // import {error} from './middleware/error';
 
 const app = express();
@@ -19,9 +20,10 @@ app.use('/api/users', userRouter);
 app.use('/api/positions', positionRouter);
 app.use('/api/players', playerRouter);
 app.use('/api/matches', matchRouter);
+app.use('/api/matchDetailes', mdRouter);
 // app.use(error);
 
-createConnection().then(async connection => {
+createConnection().then(() => {
     console.log("Connected to the database...");
 }).catch(error => console.log(error));
 

@@ -1,6 +1,7 @@
-import {Entity, Column, PrimaryGeneratedColumn, ManyToOne} from "typeorm";
+import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany} from "typeorm";
 import {Length} from "class-validator";
 import { Position } from "./Position";
+import { MatchDetailes } from "./MatchDetailes";
 
 
 @Entity()
@@ -15,5 +16,8 @@ export class Player {
 
     @ManyToOne(() => Position, position => position.players)
     position: Position;
+
+    @OneToMany(() => MatchDetailes, matchDetailes => matchDetailes.player)
+    matchDetailes: MatchDetailes[];
 
 }
