@@ -6,32 +6,24 @@ import {validate} from "class-validator";
 import * as _ from 'lodash';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
-import {auth} from '../middleware/auth'
-import {admin} from '../middleware/admin'
+import {auth} from '../middleware/auth';
+import {admin} from '../middleware/admin';
+import {async} from '../middleware/async';
  
 
 const router = express.Router();
-// router.use(express.json());
-// const userRepository = getRepository(User)
 
-// router.get("/", async function(req: Request, res: Response) {
-//     const users = await getRepository(User).find();
-//     res.status(200).send(users);
-// });
+router.get("/", async(async function(req: Request, res: Response) {
+    const users = await getRepository(User).find();
+    res.status(200).send(users);
+}));
 
-// router.get("/:id", async function(req: Request, res: Response) {
-//     const user = await getRepository(User).findOne({ where: {id: req.params.id}});
-//     if(!user) return res.status(404).send('There is no user with the given id.');
-
-//     res.status(200).send(user);
-// });
-
-router.get('/me', auth, async (req, res) => {
-    const user = await getRepository(User).findOne({ where: {id: req.userId}});
+router.get('/me', auth, async(async (req, res) => {
+    const user = await getRepository(User).findOne({ where: {id: req.userId} });
     res.send(user);
-});
+}));
 
-router.post("/register",[auth, admin], async function(req: Request, res: Response) {
+router.post("/register",[auth, admin], async(async function(req: Request, res: Response) {
     let user = await getRepository(User).findOne({ username: req.body.username })
     if(user) return res.status(400).send('User is alresdy existed!');
 
@@ -46,9 +38,9 @@ router.post("/register",[auth, admin], async function(req: Request, res: Respons
      
     await getRepository(User).save(user);
     res.status(200).send(_.pick(user, ['id', 'username']));
-});
+}));
 
-router.post("/login", async function(req: Request, res: Response) {
+router.post("/login", async(async function(req: Request, res: Response) {
     const user = await getRepository(User).findOne({ username: req.body.username })
     if(!user) return res.status(404).send('Invalid username or password.');
     
@@ -58,40 +50,38 @@ router.post("/login", async function(req: Request, res: Response) {
     const token = jwt.sign({ id: user.id, isAdmin: user.isAdmin }, '1234')
     
     await getRepository(User).save(user);
-    res.status(200).send(token);
-    
+    res.header('x-auth-token', token).status(200).send(token);    
 
-});
+}));
 
-// router.put("/:id", async function(req: Request, res: Response) {
-//     let user = await getRepository(User).findOne({ where: {id: req.params.id}});
-//     if(!user) return res.status(404).send('There is no user with the given id.');
+router.put("/:id", [auth, admin], async(async function(req: Request, res: Response) {
+    let user = await getRepository(User).findOne({ where: {id: req.params.id} });
+    if(!user) return res.status(404).send('There is no user with the given id.');
 
-//     user.username = req.body.username;
-//     user.password = req.body.password;
-//     user.isAdmin = req.body.isAdmin;
+    user.username = req.body.username;
+    user.password = req.body.password;
+    user.isAdmin = req.body.isAdmin;
 
-//     // user = await getRepository(User).update();
-//     await getRepository(User).save(user);
-//     res.status(200).send(user);
-// });
+    await getRepository(User).save(user);
+    res.status(200).send(user);
+}));
 
-// router.delete("/", async function(req: Request, res: Response) {
-//     const users = await getRepository(User).find();
+router.delete("/", [auth, admin], async(async function(req: Request, res: Response) {
+    const users = await getRepository(User).find();
 
-//     await getRepository(User).remove(users);
-//     res.status(200).send(users);
+    await getRepository(User).remove(users);
+    res.status(200).send(users);
 
-// });
+}));
 
-// router.delete("/:id", async function(req: Request, res: Response) {
-//     const user = await getRepository(User).findOne({ where: {id: req.params.id}});
-//     if(!user) return res.status(404).send('There is no user with the given id.');
+router.delete("/:id", [auth, admin], async(async function(req: Request, res: Response) {
+    const user = await getRepository(User).findOne({ where: {id: req.params.id} });
+    if(!user) return res.status(404).send('There is no user with the given id.');
 
-//     await getRepository(User).remove(user);
-//     res.status(200).send(user);
+    await getRepository(User).remove(user);
+    res.status(200).send(user);
 
-// });
+}));
 
 
 

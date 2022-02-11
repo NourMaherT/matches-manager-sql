@@ -19,40 +19,68 @@ router.get("/", auth, async(async function(req: Request, res: Response) {
 }));
 
 // Get Players participated in a particuler match
-// router.get("/match/:matchId", auth, async(async function(req: Request, res: Response) {
-//     const match = await getRepository(Match).findOne({ where: {id: req.params.matchId} });
-//     if(!match) return res.status(404).send('There is no match with the given id.');
+router.get("/match/:matchId", auth, async(async function(req: Request, res: Response) {
+    const match = await getRepository(Match).findOne({ where: {id: req.params.matchId} });
+    if(!match) return res.status(404).send('There is no match with the given id.');
     
-//     const matchesDetailes = await getRepository(MatchDetailes).find({ 
-//                                                                 where: {
-//                                                                     match: {
-//                                                                         id: match.id
-//                                                                     }
-//                                                                 },
-//                                                                 relations: ['player', 'position', 'match'],
-//                                                                 select: ['player']
-//                                                              });
-//     let players = matchesDetailes.map(record => {
-//         if(record.match.id === match.id) 
-//             return record.player.name;
-//     });
-//     res.status(200).send(matchesDetailes);
+    const matchesDetailes = await getRepository(MatchDetailes).find({
+                                                                where: {
+                                                                    match: {
+                                                                        id: match.id
+                                                                    }
+                                                                },
+                                                                relations: ['player', 'position', 'match']
+                                                            });
+    let players = matchesDetailes.map(record => {
+        // if(record.match.id === match.id) 
+            return record.player.name;
+    });
+    res.status(200).send(players);
 
-// }));
+}));
 
 // Get Matches a particuler player participated in
-// router.get("/player/:playerId", auth, async(async function(req: Request, res: Response) {
-//     const player = await getRepository(Player).findOne({ where: {id: req.params.playerId} });
-//     if(!player) return res.status(404).send('There is no player with the given id.');
+router.get("/player/:playerId", auth, async(async function(req: Request, res: Response) {
+    const player = await getRepository(Player).findOne({ where: {id: req.params.playerId} });
+    if(!player) return res.status(404).send('There is no player with the given id.');
     
-//     const matchesDetailes = await getRepository(MatchDetailes).find({ relations: ['player', 'position', 'match'] });
-//     const matches = matchesDetailes.map(record => {
-//         if(record.player.id === player.id) 
-//             return record.match;
-//     });
-//     res.status(200).send(matches);
+    const matchesDetailes = await getRepository(MatchDetailes).find({ 
+                                                                where: {
+                                                                    player: {
+                                                                        id: player.id
+                                                                    }
+                                                                },
+                                                                relations: ['player', 'position', 'match'] 
+                                                            });
+    const matches = matchesDetailes.map(record => {
+        // if(record.player.id === player.id) 
+            return record.match;
+    });
+    res.status(200).send(matches);
 
-// }));
+}));
+
+// Get one player Positions in a particuler match 
+router.get("/position/:matchId/:playerId", auth, async(async function(req: Request, res: Response) {
+    const match = await getRepository(Match).findOne({ where: {id: req.params.matchId} });
+    if(!match) return res.status(404).send('There is no match with the given id.');
+
+    const player = await getRepository(Player).findOne({ where: {id: req.params.playerId} });
+    if(!player) return res.status(404).send('There is no player with the given id.');
+    
+    const matchesDetailes = await getRepository(MatchDetailes).find({ 
+                                                                where: { match: {id: match.id}, player: {id: player.id} },
+                                                                relations: ['player', 'position', 'match'] 
+                                                            });
+    const matches = matchesDetailes.map(record => {
+        return {
+            position: record.position.name,
+            changeTime: record.changeTime
+        }
+    });
+    res.status(200).send(matches);
+
+}));
 
 
 router.post("/", [auth, admin], async(async function(req: Request, res: Response) {
