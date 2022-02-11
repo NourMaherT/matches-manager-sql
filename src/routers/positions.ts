@@ -16,7 +16,7 @@ router.get("/", auth, async(async function(req: Request, res: Response) {
 }));
 
 router.get("/:id", auth, async(async function(req: Request, res: Response) {
-    const position = await getRepository(Position).findOne({ where: {id: req.params.id}});
+    const position = await getRepository(Position).findOne({ where: {id: req.params.id} });
     if(!position) return res.status(404).send('There is no position with the given id.');
 
     res.status(200).send(position);
@@ -24,11 +24,10 @@ router.get("/:id", auth, async(async function(req: Request, res: Response) {
 
 
 router.post("/", [auth, admin], async(async function(req: Request, res: Response) {
-    let position = await getRepository(Position).findOne({ name: req.body.name })
-    if(position) return res.status(400).send('Position is alresdy existed!');
+    if (!Object.values(positions).includes(req.body.name)) return res.status(400).send(`Insert A real position!`);
 
-    
-    // if(req.body.name isn't in positions enum return error)
+    let position = await getRepository(Position).findOne({ name: req.body.name })
+    if(position) return res.status(400).send('Position is alresdy existed!');    
 
     position = new Position();
     position.name = req.body.name;
@@ -42,7 +41,7 @@ router.post("/", [auth, admin], async(async function(req: Request, res: Response
 }));
 
 router.put("/:id", [auth, admin], async(async function(req: Request, res: Response) {
-    let position = await getRepository(Position).findOne({ where: {id: req.params.id}});
+    let position = await getRepository(Position).findOne({ where: {id: req.params.id} });
     if(!position) return res.status(404).send('There is no position with the given id.');
 
     position.name = req.body.name;
@@ -64,7 +63,7 @@ router.delete("/", [auth, admin], async(async function(req: Request, res: Respon
 }));
 
 router.delete("/:id", [auth, admin], async(async function(req: Request, res: Response) {
-    const position = await getRepository(Position).findOne({ where: {id: req.params.id}});
+    const position = await getRepository(Position).findOne({ where: {id: req.params.id} });
     if(!position) return res.status(404).send('There is no Position with the given id.');
 
     await getRepository(Position).remove(position);
