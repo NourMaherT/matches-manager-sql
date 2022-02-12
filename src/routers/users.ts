@@ -1,4 +1,5 @@
 import {getRepository} from "typeorm";
+import * as config from 'config';
 import * as express from "express";
 import {Request, Response} from "express";
 import {User} from "../entity/User";
@@ -19,6 +20,7 @@ router.get("/", async(async function(req: Request, res: Response) {
 }));
 
 router.get('/me', auth, async(async (req, res) => {
+    throw new Error('Oppsy...');
     const user = await getRepository(User).findOne({ where: {id: req.userId} });
     res.send(user);
 }));
@@ -47,7 +49,7 @@ router.post("/login", async(async function(req: Request, res: Response) {
     const valid = await bcrypt.compare(req.body.password, user.password);
     if(!valid) return res.status(400).send('Invalid email or password.');
      
-    const token = jwt.sign({ id: user.id, isAdmin: user.isAdmin }, '1234')
+    const token = jwt.sign({ id: user.id, isAdmin: user.isAdmin }, config.get('jwt'))
     
     await getRepository(User).save(user);
     res.header('x-auth-token', token).status(200).send(token);    
