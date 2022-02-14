@@ -1,4 +1,6 @@
 import "reflect-metadata";
+import helmet from 'helmet';
+import * as compression from 'compression';
 import {createConnection} from "typeorm";
 import * as config from 'config';
 import * as logger from 'morgan';
@@ -13,7 +15,7 @@ import {userRouter} from './routers/users';
 import {positionRouter} from './routers/positions';
 import {playerRouter} from './routers/players';
 import {matchRouter} from './routers/matches';
-import {mdRouter} from './routers/matchesDetailes';
+import {matchDetailRouter} from './routers/matchesDetailes';
 import {error} from './middleware/error';
 
 if(!config.get('jwt')) {
@@ -21,11 +23,14 @@ if(!config.get('jwt')) {
     process.exit(1);
 }
 
+
 /**
  * Logger setup
  */
 const fileLogger = createLogger({
+    defaultMeta: { service: 'user-service' },
     transports: [
+      new transports.Console(),
       new transports.File({
         filename: 'logs/combined.log',
         level: 'info'
@@ -50,15 +55,15 @@ winston.add(fileLogger);
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// app.use(helmet());
-// app.use(compression());
+app.use(helmet());
+app.use(compression());
 app.use(logger('dev'));
 
 app.use('/api/users', userRouter);
 app.use('/api/positions', positionRouter);
 app.use('/api/players', playerRouter);
 app.use('/api/matches', matchRouter);
-app.use('/api/matchDetailes', mdRouter);
+app.use('/api/matchDetailes', matchDetailRouter);
 app.use(error);
 
 /**
@@ -87,8 +92,3 @@ createConnection().then(() => {
  httpsServer.listen(secPort, () => {
    winston.info(`Listening on port ${secPort}...`);
  });
- 
-// const port = process.env.PORT || 3000;
-// app.listen(port, () => {
-//     winston.info(`Listening on port ${port}...`);
-// });

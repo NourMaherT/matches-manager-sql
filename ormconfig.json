@@ -3,7 +3,8 @@
    "host": "localhost",
    "port": 3306,
    "username": "test",
-   "database": "test",
+   "password": "1234",
+   "database": "match-manager",
    "synchronize": true,
    "logging": false,
    "entities": [

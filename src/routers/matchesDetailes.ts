@@ -14,8 +14,8 @@ import {async} from '../middleware/async';
 const router = express.Router();
 
 router.get("/", auth, async(async function(req: Request, res: Response) {
-    const matchDetailes = await getRepository(MatchDetail).find({ relations: ['player', 'position', 'match'] });
-    res.status(200).send(matchDetailes);
+    const records = await getRepository(MatchDetail).find({ relations: ['player', 'position', 'match'] });
+    res.status(200).send(records);
 }));
 
 // Get Players participated in a particuler match
@@ -23,7 +23,7 @@ router.get("/match/:matchId", auth, async(async function(req: Request, res: Resp
     const match = await getRepository(Match).findOne({ where: {id: req.params.matchId} });
     if(!match) return res.status(404).send('There is no match with the given id.');
     
-    const matchesDetailes = await getRepository(MatchDetail).find({
+    const records = await getRepository(MatchDetail).find({
                                                                 where: {
                                                                     match: {
                                                                         id: match.id
@@ -31,10 +31,11 @@ router.get("/match/:matchId", auth, async(async function(req: Request, res: Resp
                                                                 },
                                                                 relations: ['player', 'position', 'match']
                                                             });
-    let players = matchesDetailes.map(record => {
+    let players = records.map(record => {
             return record.player.name;
     });
-    res.status(200).send(players);
+    let uniquePlayers = [...new Set(players)]
+    res.status(200).send(uniquePlayers);
 
 }));
 
@@ -43,18 +44,27 @@ router.get("/player/:playerId", auth, async(async function(req: Request, res: Re
     const player = await getRepository(Player).findOne({ where: {id: req.params.playerId} });
     if(!player) return res.status(404).send('There is no player with the given id.');
     
-    const matchesDetailes = await getRepository(MatchDetail).find({ 
-                                                                where: {
-                                                                    player: {
-                                                                        id: player.id
-                                                                    }
-                                                                },
-                                                                relations: ['player', 'position', 'match'] 
-                                                            });
-    const matches = matchesDetailes.map(record => {
+    const records = await getRepository(MatchDetail).find({ 
+                                                            where: {
+                                                                player: {
+                                                                    id: player.id
+                                                                }
+                                                            },
+                                                            relations: ['player', 'position', 'match'] 
+                                                        });
+    const matches = records.map(record => {
             return record.match;
     });
-    res.status(200).send(matches);
+    const ids = [...new Set(matches.map(v => v.id))];
+    let uniqueMatches = [];
+    ids.forEach(async function(id) {
+        const temp = await getRepository(Match).findOne({ where: {id: id} });
+        console.log(temp);
+        uniqueMatches.push(temp);
+    });
+    setTimeout(() => {
+        res.status(200).send(uniqueMatches);
+    }, 1000);
 
 }));
 
@@ -66,11 +76,11 @@ router.get("/position/:matchId/:playerId", auth, async(async function(req: Reque
     const player = await getRepository(Player).findOne({ where: {id: req.params.playerId} });
     if(!player) return res.status(404).send('There is no player with the given id.');
     
-    const matchesDetailes = await getRepository(MatchDetail).find({ 
-                                                                where: { match: {id: match.id}, player: {id: player.id} },
-                                                                relations: ['player', 'position', 'match'] 
-                                                            });
-    const matches = matchesDetailes.map(record => {
+    const records = await getRepository(MatchDetail).find({ 
+                                                            where: { match: {id: match.id}, player: {id: player.id} },
+                                                            relations: ['player', 'position', 'match'] 
+                                                        });
+    const matches = records.map(record => {
         return {
             position: record.position.name,
             changeTime: record.changeTime
@@ -178,4 +188,4 @@ router.delete("/:id", [auth, admin], async(async function(req: Request, res: Res
 }));
 
 
-export { router as mdRouter }
+export { router as matchDetailRouter }
