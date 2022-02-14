@@ -1,6 +1,6 @@
-import {Entity, Column, PrimaryGeneratedColumn, OneToMany} from "typeorm";
+import {Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn} from "typeorm";
 import {Length} from "class-validator";
-import { MatchDetailes } from "./MatchDetailes";
+import { MatchDetail } from "./MatchDetail";
 
 @Entity()
 export class Match {
@@ -19,7 +19,13 @@ export class Match {
     @Column({default: () => 'Now()'})
     date: Date;
 
-    @OneToMany(() => MatchDetailes, matchDetailes => matchDetailes.player)
-    matchDetailes: MatchDetailes[];
+    @OneToMany(() => MatchDetail, matchDetailes => matchDetailes.player)
+    matchDetailes: MatchDetail[];
+
+    @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)"})
+    created_at: Date;
+
+    @UpdateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)", onUpdate: "CURRENT_TIMESTAMP(6)"})
+    updated_at: Date;
 
 }

@@ -1,5 +1,6 @@
 import {getRepository} from "typeorm";
 import * as express from "express";
+import * as _ from 'lodash';
 import {Request, Response} from "express";
 import {Match} from "../entity/Match";
 import {validate} from "class-validator"; 
@@ -24,6 +25,14 @@ router.get("/:id", auth, async(async function(req: Request, res: Response) {
 
 
 router.post("/", [auth, admin], async(async function(req: Request, res: Response) {
+    // Avoid Duplication
+    // const oldMatch = await getRepository(Match).findOne({ where: {
+    //     team1: req.body.team1,
+    //     team2: req.body.team2,
+    //     date:
+    // }});
+    // if(oldMatch) return res.status(400).send('Duplication Error.');
+
     let match = new Match();
     match.team1 = req.body.team1;
     match.team2 = req.body.team2;

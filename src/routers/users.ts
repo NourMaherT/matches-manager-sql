@@ -20,13 +20,12 @@ router.get("/", async(async function(req: Request, res: Response) {
 }));
 
 router.get('/me', auth, async(async (req, res) => {
-    throw new Error('Oppsy...');
     const user = await getRepository(User).findOne({ where: {id: req.userId} });
     res.send(user);
 }));
 
-router.post("/register",[auth, admin], async(async function(req: Request, res: Response) {
-    let user = await getRepository(User).findOne({ username: req.body.username })
+router.post("/register", [auth, admin], async(async function(req: Request, res: Response) {
+    let user = await getRepository(User).findOne({ username: req.body.username });
     if(user) return res.status(400).send('User is alresdy existed!');
 
     user = new User();
@@ -39,20 +38,23 @@ router.post("/register",[auth, admin], async(async function(req: Request, res: R
     if (errors.length > 0) return res.status(400).send(errors);
      
     await getRepository(User).save(user);
+
+    //const token = jwt.sign({ id: user.id, isAdmin: user.isAdmin }, config.get('jwt'))
+    //res.header('x-auth-token', token).status(200).send(_.pick(user, ['id', 'username']));
     res.status(200).send(_.pick(user, ['id', 'username']));
 }));
 
 router.post("/login", async(async function(req: Request, res: Response) {
-    const user = await getRepository(User).findOne({ username: req.body.username })
+    const user = await getRepository(User).findOne({ username: req.body.username });
     if(!user) return res.status(404).send('Invalid username or password.');
     
     const valid = await bcrypt.compare(req.body.password, user.password);
     if(!valid) return res.status(400).send('Invalid email or password.');
      
-    const token = jwt.sign({ id: user.id, isAdmin: user.isAdmin }, config.get('jwt'))
+    const token = jwt.sign({ id: user.id, isAdmin: user.isAdmin }, config.get('jwt'));
     
     await getRepository(User).save(user);
-    res.header('x-auth-token', token).status(200).send(token);    
+    res.send(token);    
 
 }));
 

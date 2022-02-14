@@ -26,7 +26,7 @@ router.get("/:id", auth, async(async function(req: Request, res: Response) {
 router.post("/", [auth, admin], async(async function(req: Request, res: Response) {
     if (!Object.values(positions).includes(req.body.name)) return res.status(400).send(`Insert A real position!`);
 
-    let position = await getRepository(Position).findOne({ name: req.body.name })
+    let position = await getRepository(Position).findOne({ name: req.body.name });
     if(position) return res.status(400).send('Position is alresdy existed!');    
 
     position = new Position();

@@ -5,7 +5,9 @@ import * as logger from 'morgan';
 import * as express from 'express';
 import * as winston from 'winston';
 import { createLogger, transports } from 'winston';
-// import 'express-async-errors';
+import * as fs from 'fs';
+import * as http from 'http';
+import * as https from 'https';
 
 import {userRouter} from './routers/users';
 import {positionRouter} from './routers/positions';
@@ -19,30 +21,37 @@ if(!config.get('jwt')) {
     process.exit(1);
 }
 
+/**
+ * Logger setup
+ */
 const fileLogger = createLogger({
     transports: [
       new transports.File({
-        filename: 'combined.log',
+        filename: 'logs/combined.log',
         level: 'info'
       }),
       new transports.File({
-        filename: 'errors.log',
+        filename: 'logs/errors.log',
         level: 'error'
       })
     ],
     exceptionHandlers: [
-      new transports.File({ filename: 'exceptions.log' })
+      new transports.File({ filename: 'logs/exceptions.log' })
     ],
     rejectionHandlers: [
-      new transports.File({ filename: 'rejections.log' })
+      new transports.File({ filename: 'logs/rejections.log' })
     ]
   });
 winston.add(fileLogger);
 
-
+/**
+ * Express Pipelines
+ */
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// app.use(helmet());
+// app.use(compression());
 app.use(logger('dev'));
 
 app.use('/api/users', userRouter);
@@ -52,11 +61,34 @@ app.use('/api/matches', matchRouter);
 app.use('/api/matchDetailes', mdRouter);
 app.use(error);
 
+/**
+ * DB setup
+ */
 createConnection().then(() => {
-    console.log("Connected to the database...");
+    winston.info("Connected to the database...");
 }).catch(error => console.log(error));
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-    console.log(`Listening on port ${port}...`);
-});
+/**
+ * Http and Https setup
+ */
+ const privateKey  = fs.readFileSync('sslcert/selfsigned.key', 'utf8');
+ const certificate = fs.readFileSync('sslcert/selfsigned.crt', 'utf8');
+ const credentials = {key: privateKey, cert: certificate};
+ 
+ const port = process.env.PORT || 3000;
+ const secPort = process.env.PORT || 3443;
+ 
+ const httpServer = http.createServer(app);
+ const httpsServer = https.createServer(credentials, app);
+ 
+ httpServer.listen(port, () => {
+   winston.info(`Listening on port ${port}...`);
+ });
+ httpsServer.listen(secPort, () => {
+   winston.info(`Listening on port ${secPort}...`);
+ });
+ 
+// const port = process.env.PORT || 3000;
+// app.listen(port, () => {
+//     winston.info(`Listening on port ${port}...`);
+// });

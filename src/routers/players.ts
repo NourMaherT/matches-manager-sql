@@ -24,8 +24,15 @@ router.get("/:id", auth, async(async function(req: Request, res: Response) {
 }));
 
 router.post("/", [auth, admin], async(async function(req: Request, res: Response) {
-    const position = await getRepository(Position).findOne({ name: req.body.position })
+    const position = await getRepository(Position).findOne({ id: req.body.positionId });
     if(!position) return res.status(404).send('Position is not available!');
+
+    // Avoid Duplication
+    const oldPlayer = await getRepository(Player).findOne({ where:{
+        name: req.body.name,
+        position: {id: req.body.positionId}
+    }});
+    if(oldPlayer) return res.status(400).send('Duplication Error.');
 
     let player = new Player();
     player.name = req.body.name;
@@ -42,7 +49,7 @@ router.put("/:id", [auth, admin], async(async function(req: Request, res: Respon
     let player = await getRepository(Player).findOne({ where: {id: req.params.id} });
     if(!player) return res.status(404).send('There is no player with the given id.');
 
-    const position = await getRepository(Position).findOne({ name: req.body.position })
+    const position = await getRepository(Position).findOne({ name: req.body.position });
     if(!position) return res.status(404).send('Position is not available!');
 
     player.name = req.body.name;

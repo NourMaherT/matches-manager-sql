@@ -1,7 +1,7 @@
-import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany} from "typeorm";
+import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn} from "typeorm";
 import {Length} from "class-validator";
 import { Position } from "./Position";
-import { MatchDetailes } from "./MatchDetailes";
+import { MatchDetail } from "./MatchDetail";
 
 
 @Entity()
@@ -17,7 +17,13 @@ export class Player {
     @ManyToOne(() => Position, position => position.players)
     position: Position;
 
-    @OneToMany(() => MatchDetailes, matchDetailes => matchDetailes.player)
-    matchDetailes: MatchDetailes[];
+    @OneToMany(() => MatchDetail, matchDetailes => matchDetailes.player)
+    matchDetailes: MatchDetail[];
+
+    @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)"})
+    created_at: Date;
+
+    @UpdateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)", onUpdate: "CURRENT_TIMESTAMP(6)"})
+    updated_at: Date;
 
 }
