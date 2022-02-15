@@ -7,11 +7,10 @@
 ### 🔖 Table Of Contents
 
 - 🤔 [How To Use](#how-to-use)
-- 🤔 [What Are The APIs](#what-are-the-apis)
+- 😕 [What Are The APIs](#what-are-the-apis)
 - 🚀 [Technologies](#technologies)
 - 🌱 [Minimal Requirements](#minimal-requirements)
 - 🎊 [Features](#features)
-- 🎇 [On Progress](#features-progress)
 - 💡 [How To Contribute](#how-to-contribute)
 - 🤗 [Contributors](#contributors)
 - 👤 [Author](#author)
@@ -39,6 +38,17 @@ npm install
 - Create a db and user account on PhpMyAdmin page to match the settings in ormconfig.json file
 - Disable SSL on your postman
 
+set environment variables
+
+```sh
+set match_jwt=1234
+```
+
+OR (if you're on bash)
+
+```sh
+export match_jwt=1234
+```
 
 Run the server 
 
@@ -63,7 +73,7 @@ Enjoy exploring the APIs!
 
 ---
 
-<h2 id="what-are-the-apis">🤔 What Are The APIs</h2>
+<h2 id="what-are-the-apis"😕 What Are The APIs</h2>
 
 - '/api/users' Get<b>(no auth)</b> Update-Delete<b>(auth with admin)</b>
 - 'api/users/me' Get<b>(auth)</b>
@@ -113,8 +123,6 @@ Enjoy exploring the APIs!
 ---
 
 <h2 id="features">🎊 Features</h2>
-
-<h4 id="features-progress">🎇 ...</h4>
 
 - Working on a secure channel 'https'
 - Store logs localy
