@@ -15,7 +15,7 @@ export class Player {
     name: string;
 
     @ManyToOne(() => Position, position => position.players)
-    position: Position;
+    position: Position; //default one in general
 
     @OneToMany(() => MatchDetail, matchDetailes => matchDetailes.player)
     matchDetailes: MatchDetail[];
